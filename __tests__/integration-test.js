@@ -54,10 +54,46 @@ describe("GET /api", ()=>{
             const regEx = /\/api/
             const keys = Object.keys(body.endpoints)
             keys.forEach((key)=>{
-                console.log(key)
                 expect(regEx.test(key)).toBe(true)
             })
             })
         })
     }
 )
+
+describe("GET /api/articles/:article_id", ()=>{
+    test("200 status code: responds with an article object corresponding to the article_id provided", ()=>{
+        return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({body})=>{
+          expect(body.article.length).toBe(1)
+          expect(body.article[0]).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: 1,
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String)
+          })
+        })
+    })
+    test("404 status code: No articles with that id! when passed an id that does not match any article in database", ()=>{
+        return request(app)
+        .get("/api/articles/1000")
+        .expect(404)
+        .then(({body})=>{
+            expect(body.msg).toBe('No articles with that id!')
+        })
+    })
+    test("400 status code: Bad Request when passed an id that is not a number", ()=>{
+        return request(app)
+        .get("/api/articles/one")
+        .expect(400)
+        .then(({body})=>{
+            expect(body.msg).toBe('Bad Request')
+        })
+    })
+})
