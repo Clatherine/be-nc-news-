@@ -1,4 +1,5 @@
 const db = require('../db/connection')
+const fs = require('fs/promises')
 
 exports.fetchTopics = ()=>{
 
@@ -9,4 +10,13 @@ exports.fetchTopics = ()=>{
         }
         return rows
     })
+}
+
+exports.fetchEndpoints = ()=>{
+return fs.readFile('endpoints.json', 'utf-8')
+.then((fileContents)=>{
+    const parsedFileContents = JSON.parse(fileContents)
+delete parsedFileContents['GET /api']
+    return parsedFileContents
+})
 }
