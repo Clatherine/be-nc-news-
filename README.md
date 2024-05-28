@@ -1,8 +1,7 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
-
-
+Before you start:
+You will need to make a .env.development and a .env.test file to connect to your test and development databases locally.
 
 --- 
 
