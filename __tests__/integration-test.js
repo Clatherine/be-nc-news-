@@ -5,7 +5,6 @@ const seed = require("../db/seeds/seed.js")
 const testData = require("../db/data/test-data/index.js")
 
 beforeEach(()=>{
-    console.log("seeding...")
     return seed(testData)
 })
 afterAll(()=> db.end())
@@ -27,8 +26,8 @@ describe("GET /api/topics", ()=>{
         .get("/api/topics")
         .expect(200)
         .then(({body})=>{
-            expect(body.length).toBe(3)
-            body.forEach((topic)=>{
+            expect(body.topics.length).toBe(3)
+            body.topics.forEach((topic)=>{
                 expect(topic).toMatchObject({
                     description: expect.any(String),
                     slug: expect.any(String)
