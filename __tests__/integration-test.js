@@ -67,9 +67,7 @@ describe("GET /api/articles/:article_id", ()=>{
         .get("/api/articles/1")
         .expect(200)
         .then(({body})=>{
-            console.log(body)
           expect(body.article.length).toBe(1)
-          console.log(body.article[0])
           expect(body.article[0]).toMatchObject({
             author: expect.any(String),
             title: expect.any(String),
@@ -87,7 +85,6 @@ describe("GET /api/articles/:article_id", ()=>{
         .get("/api/articles/1000")
         .expect(404)
         .then(({body})=>{
-            console.log(body.msg, 'msg')
             expect(body.msg).toBe('No articles with that id!')
         })
     })
