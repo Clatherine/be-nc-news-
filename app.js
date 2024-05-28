@@ -20,7 +20,7 @@ app.use((err, req, res, next)=>{
 
 app.use((err, req, res, next)=>{
     if (err.code){
-        res.status(400).send({msg: "Bad Request"})
+        res.status(400).send({msg: "Invalid input"})
     }
 })
 

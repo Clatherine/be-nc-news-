@@ -67,8 +67,7 @@ describe("GET /api/articles/:article_id", ()=>{
         .get("/api/articles/1")
         .expect(200)
         .then(({body})=>{
-          expect(body.article.length).toBe(1)
-          expect(body.article[0]).toMatchObject({
+          expect(body.article).toMatchObject({
             author: expect.any(String),
             title: expect.any(String),
             article_id: 1,
@@ -93,7 +92,7 @@ describe("GET /api/articles/:article_id", ()=>{
         .get("/api/articles/one")
         .expect(400)
         .then(({body})=>{
-            expect(body.msg).toBe('Bad Request')
+            expect(body.msg).toBe('Invalid input')
         })
     })
 })
