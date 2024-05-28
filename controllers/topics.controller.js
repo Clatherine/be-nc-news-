@@ -1,4 +1,5 @@
-const {fetchTopics, fetchEndpoints, fetchArticleById, fetchArticles} = require("../models/topics.model")
+const {fetchTopics, fetchArticleById, fetchArticles} = require("../models/topics.model")
+const endpoints = require("../endpoints.json")
 
 exports.getTopics = (req, res, next) =>{
     fetchTopics().then((topics) =>{
@@ -9,11 +10,8 @@ exports.getTopics = (req, res, next) =>{
 }
 
 exports.getEndpoints = (req, res, next) =>{
-    fetchEndpoints().then((endpoints)=>{
-        res.status(200).json({endpoints})
-    }).catch((err)=>{
-        next(err)
-    })
+    delete endpoints['GET /api']
+    res.status(200).send({endpoints})
 }
 
 exports.getArticlesById = (req, res, next) =>{

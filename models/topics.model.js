@@ -2,6 +2,7 @@ const db = require('../db/connection')
 const fs = require('fs/promises')
 const format = require("pg-format")
 
+
 exports.fetchTopics = ()=>{
 
     return db.query("SELECT slug, description FROM topics")
@@ -11,15 +12,6 @@ exports.fetchTopics = ()=>{
         }
         return rows
     })
-}
-
-exports.fetchEndpoints = ()=>{
-return fs.readFile('endpoints.json', 'utf-8')
-.then((fileContents)=>{
-    const parsedFileContents = JSON.parse(fileContents)
-delete parsedFileContents['GET /api']
-    return parsedFileContents
-})
 }
 
 exports.fetchArticleById = (article_id)=>{
