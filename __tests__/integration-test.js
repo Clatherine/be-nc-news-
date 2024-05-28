@@ -37,3 +37,28 @@ describe("GET /api/topics", ()=>{
         })
     })
 })
+
+describe("GET /api", ()=>{
+    test("200 status: returns object containing a key-value pair for all available endpoints", ()=>{
+        return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({body})=>{
+            const values = Object.values(body.endpoints)
+            values.forEach((value)=>{
+                expect(value).toMatchObject({
+                    description: expect.any(String),
+                    queries: expect.any(Object),
+                    exampleResponse: expect.any(Object)
+                })
+            })
+            const regEx = /\/api/
+            const keys = Object.keys(body.endpoints)
+            keys.forEach((key)=>{
+                console.log(key)
+                expect(regEx.test(key)).toBe(true)
+            })
+            })
+        })
+    }
+)
