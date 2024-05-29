@@ -367,3 +367,31 @@ describe("PATCH /api/articles/:article_id", ()=>{
         })
     })
 })
+
+describe("DELETE /api/comments/:comment_id", ()=>{
+    test('status 204, no response', ()=>{
+        return request(app)
+        .delete('/api/comments/1')
+        .expect(204)
+        .then((body)=>{
+            expect(Object.keys(body)).not.toInclude('body')
+    })
+    })
+    test('status 404, responds with "That comment does not exist!" if passed a comment_id that doesn\'t exist', ()=>{
+        return request(app)
+        .delete('/api/comments/30')
+        .expect(404)
+        .then(({body})=>{
+            expect(body.msg).toBe('That comment does not exist!')
+    })
+    })
+    test('status 400, responds with "Invalid input" if passed a comment_id that is not a number', ()=>{
+        return request(app)
+        .delete('/api/comments/three')
+        .expect(400)
+        .then(({body})=>{
+            expect(body.msg).toBe('Invalid input')
+    })
+    })
+
+})

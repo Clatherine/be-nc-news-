@@ -94,6 +94,11 @@
         }
       ]
     }
+  },
+  "DELETE /api/comments/:comment_id":{
+    "description": "deletes a comment from the comments table according to the comment_id passed; returns no response",
+    "queries": [],
+    "exampleResponse":{}
   }
 
 }
