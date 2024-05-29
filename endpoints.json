@@ -99,6 +99,19 @@
     "description": "deletes a comment from the comments table according to the comment_id passed; returns no response",
     "queries": [],
     "exampleResponse":{}
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "butter_bridge",
+          "name": "jonny",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        }
+      ]
+    }
   }
 
 }
