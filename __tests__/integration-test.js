@@ -138,34 +138,103 @@ describe("GET /api/articles/:article_id/comments", () => {
           });
         });
         expect(body.comments).toBeSortedBy("created_at", {
-            descending: true
-        })
+          descending: true,
+        });
       });
   });
-  test("400 status code: 'Invalid input' if passed an id that is not a number", ()=>{
+  test("400 status code: 'Invalid input' if passed an id that is not a number", () => {
     return request(app)
-    .get('/api/articles/one/comments')
-    .expect(400)
-    .then(({body})=>{
-        expect(body.msg).toBe('Invalid input')
-    })
-  })
-  test("200 status code: resolves with an empty array if passed an article_id that exists but has no associated comments", ()=>{
+      .get("/api/articles/one/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  test("200 status code: resolves with an empty array if passed an article_id that exists but has no associated comments", () => {
     return request(app)
-    .get('/api/articles/2/comments')
-    .expect(200)
-    .then(({body})=>{
-        expect(body.comments).toEqual([])
-    })
-  })
-  test("404 status code: 'That article_id does not exist!' if passed an id that does not exist", ()=>{
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toEqual([]);
+      });
+  });
+  test("404 status code: 'That article does not exist!' if passed an id that does not exist", () => {
     return request(app)
-    .get('/api/articles/20/comments')
-    .expect(404)
-    .then(({body})=>{
-    expect(body.msg).toBe('That article_id does not exist!')
-  }) 
-  })
- 
-  
+      .get("/api/articles/20/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("That article does not exist!");
+      });
+  });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201 status code: responds with the posted comment", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({
+        username: "lurker",
+        body: "A little tale ",
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.addedComment).toMatchObject({
+          author: "lurker",
+          body: "A little tale ",
+          article_id: 1,
+          comment_id: expect.any(Number),
+          votes: 0,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test('404 status code: "That username does not exist!" if passed a username that does not exist in the users table', () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({
+        username: "Wee willy winky",
+        body: "A little tale ",
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("That username does not exist!");
+      });
+  });
+  test('404 status code: "That article does not exist!" if passed an article_id that does not exist in articles table', ()=>{
+    return request(app)
+    .post("/api/articles/30/comments")
+    .send({
+        username: "lurker",
+        body: "A little tale ",
+    })
+    .expect(404)
+    .then(({ body}) =>{
+            expect(body.msg).toBe("That article does not exist!")
+        })
+    })
+    test('400 status code: "Incomplete POST request: one or more required fields missing data" when sent a post request lacking a required key', ()=>{
+        return request(app)
+        .post("/api/articles/1/comments")
+        .send({
+            body:"A little tale"
+        })
+        .expect(400)
+        .then(({body})=>{
+            expect(body.msg).toBe("Incomplete POST request: one or more required fields missing data")
+        })
+    })
+    test('400 status code: "Unexpected properties on request body" when sent a body with additional properties', ()=>{
+        return request(app)
+        .post("/api/articles/1/comments")
+        .send({
+            username: "lurker",
+            body:"A little tale",
+            votes: 1
+        })
+        .expect(400)
+        .then(({body})=>{
+            expect(body.msg).toBe("Unexpected properties on request body")
+        })
+    })
+
+  })

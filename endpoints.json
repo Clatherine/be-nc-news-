@@ -60,5 +60,21 @@
         }
       ]
     }
+  },
+  "POST /api/articles/article_id/comments": {
+    "description": "adds a comment to the comments table associated with the passed article_id, and returns the added comment",
+    "queries": [],
+    "exampleResponse": {
+      "comment": [
+        {
+          "comment_id": 30,
+          "votes": 0,
+          "created_at": "2020-02-23T12:01:00.000Z",
+          "author":"Roald Dahl",
+          "body":"I write for kids and adults alike",
+          "article_id": 1
+        }
+      ]
+    }
   }
 }
