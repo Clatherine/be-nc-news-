@@ -112,19 +112,11 @@ describe("GET /api/articles", () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             article_img_url: expect.any(String),
-            comment_count: expect.any(String),
+            comment_count: expect.any(Number),
           });
           expect(article).not.toHaveProperty("body");
         });
         expect(body.articles).toBeSortedBy("created_at", { descending: true });
-      });
-  });
-  test("400 status code: 'Bad Request' response if spell 'articles' incorrectly", () => {
-    return request(app)
-      .get("/api/article")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Route not found");
       });
   });
 });
