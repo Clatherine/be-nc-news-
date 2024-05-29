@@ -22,9 +22,7 @@ exports.postComment = (req, res, next)=>{
       res.status(400).send({msg: "Incomplete POST request: one or more required fields missing data"
       })
     }
-
     const bodyKeys = Object.keys(body)
-    console.log(bodyKeys.length, 'bodyKeys.length')
     if (bodyKeys.length !== 2){
         res.status(400).send({msg: "Unexpected properties on request body"})
     }
