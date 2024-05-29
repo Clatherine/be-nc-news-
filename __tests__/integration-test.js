@@ -127,6 +127,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
+        expect(body.comments.length).toBe(11)
         body.comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
@@ -238,3 +239,131 @@ describe("POST /api/articles/:article_id/comments", () => {
     })
 
   })
+
+describe("PATCH /api/articles/:article_id", ()=>{
+    test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where newVote is 1", ()=>{
+        return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes : 1 })
+        .expect(200)
+        .then(({body})=>{
+          expect(body.updatedArticle).toEqual({
+            author: 'butter_bridge',
+            title: 'Living in the shadow of a great man',
+            article_id: 1,
+            body: 'I find this existence challenging',
+            topic: 'mitch',
+            created_at: '2020-07-09T20:11:00.000Z',
+            votes: 101,
+            article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+          })
+        })
+
+    })
+    test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where newVote is >1", ()=>{
+        return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes : 3 })
+        .expect(200)
+        .then(({body})=>{
+          expect(body.updatedArticle).toEqual({
+            author: 'butter_bridge',
+            title: 'Living in the shadow of a great man',
+            article_id: 1,
+            body: 'I find this existence challenging',
+            topic: 'mitch',
+            created_at: '2020-07-09T20:11:00.000Z',
+            votes: 103,
+            article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+          })
+        })
+
+    })
+    test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where newVote is -1", ()=>{
+        return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes : -1 })
+        .expect(200)
+        .then(({body})=>{
+          expect(body.updatedArticle).toEqual({
+            author: 'butter_bridge',
+            title: 'Living in the shadow of a great man',
+            article_id: 1,
+            body: 'I find this existence challenging',
+            topic: 'mitch',
+            created_at: '2020-07-09T20:11:00.000Z',
+            votes: 99,
+            article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+          })
+        })
+    })
+    test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where newVote is <-1", ()=>{
+        return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes : -3 })
+        .expect(200)
+        .then(({body})=>{
+          expect(body.updatedArticle).toEqual({
+            author: 'butter_bridge',
+            title: 'Living in the shadow of a great man',
+            article_id: 1,
+            body: 'I find this existence challenging',
+            topic: 'mitch',
+            created_at: '2020-07-09T20:11:00.000Z',
+            votes: 97,
+            article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+          })
+        })
+    })
+    test("400 status code: responds with 'We're not popular enough to subtract that amount!' if sent a negative number greater than the initial number of votes", ()=>{
+        return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes : -150 })
+        .expect(400)
+        .then(({body})=>{
+          expect(body.msg).toBe('We\'re not popular enough to subtract that amount!')
+        })
+    })
+    test("404 status code: responds with 'That article does not exist!' if passed an article_id that doesn't exist", ()=>{
+        return request(app)
+        .patch('/api/articles/30')
+        .send({ inc_votes : 3 })
+        .expect(404)
+        .then(({body})=>{
+          expect(body.msg).toBe('That article does not exist!')
+        })
+    })
+    test("400 status code: responds with 'Invalid input' when passed a value that is not a number for inc_votes", ()=>{
+        return request(app)
+        .patch('/api/articles/3')
+        .send({ inc_votes : "four"})
+        .expect(400)
+        .then(({body})=>{
+          expect(body.msg).toBe('Invalid input')
+        })
+    })
+    test('400 status code: "Incomplete PATCH request: missing "inc_votes" property!" when sent a body missing inc_votes', ()=>{
+        return request(app)
+        .patch('/api/articles/3')
+        .send({
+            author: "Newton"
+        })
+        .expect(400)
+        .then(({body})=>{
+          expect(body.msg).toBe("Incomplete PATCH request: missing 'inc_votes' property!")
+        })
+    })
+
+    test('400 status code: "Unexpected properties on request body" when sent a body with additional properties', ()=>{
+        return request(app)
+        .patch('/api/articles/3')
+        .send({ inc_votes : 1,
+            author: "Newton", 
+            inc_votes: 3
+        })
+        .expect(400)
+        .then(({body})=>{
+          expect(body.msg).toBe('Unexpected properties on request body')
+        })
+    })
+})
