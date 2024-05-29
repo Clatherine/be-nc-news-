@@ -29,5 +29,27 @@ exports.checkArticleIdExists = (article_id)=>{
         if(rows.length ===0){
             return Promise.reject({status: 404, msg:"That article does not exist!"})
             }
+    
     })
+}
+
+exports.editArticle = (article_id, body)=>{
+    return db.query("SELECT votes FROM articles WHERE article_id = $1", [article_id]).then(({rows})=>{
+      const currentVotes = rows[0].votes 
+      const increment = body.inc_votes
+      const updatedVotes = currentVotes + increment
+      if(updatedVotes<0){
+        return Promise.reject({status: 400, msg:'We\'re not popular enough to subtract that amount!'})
+      }
+      else {
+      return db.query("UPDATE articles SET votes = $1 WHERE article_id = $2 RETURNING *", [updatedVotes, article_id])
+    .then(({rows})=>{
+        if(rows.length===0){
+            return Promise.reject({status: 404, msg:"That article does not exist!"})
+            }
+            return rows[0]
+    })
+}
+}
+    )
 }
