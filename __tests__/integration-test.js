@@ -189,6 +189,18 @@ describe("POST /api/articles/:article_id/comments", () => {
         });
       });
   });
+  test('400 status code: "Invalid input" if passed an article id that is not a number', () => {
+    return request(app)
+      .post("/api/articles/one/comments")
+      .send({
+        username: "Wee willy winky",
+        body: "A little tale ",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
   test('404 status code: "That username does not exist!" if passed a username that does not exist in the users table', () => {
     return request(app)
       .post("/api/articles/1/comments")
@@ -224,7 +236,7 @@ describe("POST /api/articles/:article_id/comments", () => {
             expect(body.msg).toBe("Incomplete POST request: one or more required fields missing data")
         })
     })
-    test('400 status code: "Unexpected properties on request body" when sent a body with additional properties', ()=>{
+    test('201 status code: responds with the posted comment when sent a body with additional properties', ()=>{
         return request(app)
         .post("/api/articles/1/comments")
         .send({
@@ -232,9 +244,16 @@ describe("POST /api/articles/:article_id/comments", () => {
             body:"A little tale",
             votes: 1
         })
-        .expect(400)
+        .expect(201)
         .then(({body})=>{
-            expect(body.msg).toBe("Unexpected properties on request body")
+            expect(body.addedComment).toMatchObject({
+                author: "lurker",
+                body: "A little tale",
+                article_id: 1,
+                comment_id: expect.any(Number),
+                votes: 0,
+                created_at: expect.any(String)
+              })
         })
     })
 
