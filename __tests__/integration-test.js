@@ -142,6 +142,14 @@ describe("GET /api/articles/:article_id/comments", () => {
         })
       });
   });
+  test("400 status code: 'Invalid input' if passed an id that is not a number", ()=>{
+    return request(app)
+    .get('/api/articles/one/comments')
+    .expect(400)
+    .then(({body})=>{
+        expect(body.msg).toBe('Invalid input')
+    })
+  })
   test("404 status code: 'No comments found!' if passed an id that has no associated comments", ()=>{
     return request(app)
     .get('/api/articles/2/comments')
@@ -159,13 +167,6 @@ describe("GET /api/articles/:article_id/comments", () => {
     //I would like to be able to return a different comment for this scenario to say 'no articles exist with that id', but I'm not sure how to differentiate between this and the scenario above using rejected Promises
   }) 
   })
-  test("400 status code: 'Invalid input' if passed an id that is not a number", ()=>{
-    return request(app)
-    .get('/api/articles/one/comments')
-    .expect(400)
-    .then(({body})=>{
-        expect(body.msg).toBe('Invalid input')
-    })
-  })
+ 
   
 });
