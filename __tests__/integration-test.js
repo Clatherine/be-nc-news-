@@ -150,21 +150,20 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe('Invalid input')
     })
   })
-  test("404 status code: 'No comments found!' if passed an id that has no associated comments", ()=>{
+  test("200 status code: resolves with an empty array if passed an article_id that exists but has no associated comments", ()=>{
     return request(app)
     .get('/api/articles/2/comments')
-    .expect(404)
+    .expect(200)
     .then(({body})=>{
-        expect(body.msg).toBe('No comments found!')
+        expect(body.comments).toEqual([])
     })
   })
-  test("404 status code: 'No comments found!' if passed an id that does not exist", ()=>{
+  test("404 status code: 'That article_id does not exist!' if passed an id that does not exist", ()=>{
     return request(app)
     .get('/api/articles/20/comments')
     .expect(404)
     .then(({body})=>{
-    expect(body.msg).toBe('No comments found!')
-    //I would like to be able to return a different comment for this scenario to say 'no articles exist with that id', but I'm not sure how to differentiate between this and the scenario above using rejected Promises
+    expect(body.msg).toBe('That article_id does not exist!')
   }) 
   })
  
