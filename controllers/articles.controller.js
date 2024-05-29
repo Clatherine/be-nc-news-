@@ -1,4 +1,4 @@
-const {fetchArticleById, fetchArticles, fetchArticleCommentsByArticleId, checkArticleIdExists} = require("../models/articles.model")
+const {fetchArticleById, fetchArticles, checkArticleIdExists} = require("../models/articles.model")
 
 exports.getArticlesById = (req, res, next) =>{
     const {article_id} = req.params
@@ -16,14 +16,3 @@ fetchArticles().then((articles)=>{
 })
 }
 
-exports.getArticleCommentsByArticleId = (req, res, next)=>{
-    const {article_id} = req.params
-    const promisesArr = [fetchArticleCommentsByArticleId(article_id),
-        checkArticleIdExists(article_id)]
-    Promise.all(promisesArr)
-    .then((resolvedPromises)=>{
-        const comments = resolvedPromises[0]
-        res.status(200).send({comments})
-    })
-    .catch(next)
-}
