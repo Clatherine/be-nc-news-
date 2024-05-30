@@ -86,12 +86,12 @@ describe("GET /api/articles/:article_id", () => {
         expect(body.msg).toBe("No articles with that id!");
       });
   });
-  test("400 status code: Bad Request when passed an id that is not a number", () => {
+  test("400 status code: Invalid input: expected a number when passed an id that is not a number", () => {
     return request(app)
       .get("/api/articles/one")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
+        expect(body.msg).toBe("Invalid input: expected a number");
       });
   });
 });
@@ -119,6 +119,44 @@ describe("GET /api/articles", () => {
         expect(body.articles).toBeSortedBy("created_at", { descending: true });
       });
   });
+test("200 status code: responds with an array of articles filtered by the topic provided, sorted by date in descending order, when passed a query of 'topic' with a topic that exists and has matching articles", ()=>{
+    return request(app)
+    .get('/api/articles?topic=mitch')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.articles.length).toBe(12)
+        expect(body.articles).toBeSortedBy("created_at", {descending: true})
+        body.articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            });
+            expect(article).not.toHaveProperty("body");
+          });
+    })
+})
+test("200 status code: resolves with an empty array if passed a query of 'topic' with a topic name that exists but has no associated articles", ()=>{
+    return request(app)
+    .get('/api/articles?topic=paper')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.articles.length).toBe(0)
+    })
+})
+test("404 status code: resolves with a message of 'That topic does not exist!' if passed a query of 'topic' with a topic that doesn't exist", ()=>{
+    return request(app)
+    .get('/api/articles/?topic=plants')
+    .expect(404)
+    .then(({body})=>{
+        expect(body.msg).toBe('That topic does not exist!')
+    })
+})
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -143,12 +181,12 @@ describe("GET /api/articles/:article_id/comments", () => {
         });
       });
   });
-  test("400 status code: 'Invalid input' if passed an id that is not a number", () => {
+  test("400 status code: 'Invalid input: expected a number' if passed an id that is not a number", () => {
     return request(app)
       .get("/api/articles/one/comments")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
+        expect(body.msg).toBe("Invalid input: expected a number");
       });
   });
   test("200 status code: resolves with an empty array if passed an article_id that exists but has no associated comments", () => {
@@ -189,16 +227,16 @@ describe("POST /api/articles/:article_id/comments", () => {
         });
       });
   });
-  test('400 status code: "Invalid input" if passed an article id that is not a number', () => {
+  test('400 status code: "Invalid input: expected a number" if passed an article id that is not a number', () => {
     return request(app)
       .post("/api/articles/one/comments")
       .send({
-        username: "Wee willy winky",
+        username: "lurker",
         body: "A little tale ",
       })
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
+        expect(body.msg).toBe("Invalid input: expected a number");
       });
   });
   test('404 status code: "That username does not exist!" if passed a username that does not exist in the users table', () => {
@@ -352,13 +390,13 @@ describe("PATCH /api/articles/:article_id", ()=>{
           expect(body.msg).toBe('That article does not exist!')
         })
     })
-    test("400 status code: responds with 'Invalid input' when passed a value that is not a number for inc_votes", ()=>{
+    test("400 status code: responds with 'Invalid input: expected a number' when passed a value that is not a number for inc_votes", ()=>{
         return request(app)
         .patch('/api/articles/3')
         .send({ inc_votes : "four"})
         .expect(400)
         .then(({body})=>{
-          expect(body.msg).toBe('Invalid input')
+          expect(body.msg).toBe('Invalid input: expected a number')
         })
     })
     test('400 status code: "Incomplete PATCH request: missing "inc_votes" property!" when sent a body missing inc_votes', ()=>{
@@ -372,7 +410,6 @@ describe("PATCH /api/articles/:article_id", ()=>{
           expect(body.msg).toBe("Incomplete PATCH request: missing 'inc_votes' property!")
         })
     })
-
     test('400 status code: "Unexpected properties on request body" when sent a body with additional properties', ()=>{
         return request(app)
         .patch('/api/articles/3')
@@ -404,12 +441,12 @@ describe("DELETE /api/comments/:comment_id", ()=>{
             expect(body.msg).toBe('That comment does not exist!')
     })
     })
-    test('status 400, responds with "Invalid input" if passed a comment_id that is not a number', ()=>{
+    test('status 400, responds with "Invalid input: expected a number" if passed a comment_id that is not a number', ()=>{
         return request(app)
         .delete('/api/comments/three')
         .expect(400)
         .then(({body})=>{
-            expect(body.msg).toBe('Invalid input')
+            expect(body.msg).toBe('Invalid input: expected a number')
     })
     })
 

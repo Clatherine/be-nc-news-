@@ -28,8 +28,8 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles",
-    "queries": [],
+    "description": "serves an array of all articles, that can be filtered by the allowed queries",
+    "queries": ["topic"],
     "exampleResponse": {
       "articles": [
         {
