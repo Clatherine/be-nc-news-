@@ -1,4 +1,5 @@
 const {fetchArticleById, fetchArticles, checkArticleIdExists, editArticle} = require("../models/articles.model")
+const { checkTopicExists } = require("../models/topics.model")
 
 exports.getArticlesById = (req, res, next) =>{
     const {article_id} = req.params
@@ -9,7 +10,13 @@ exports.getArticlesById = (req, res, next) =>{
 }
 
 exports.getArticles = (req, res, next)=>{
-fetchArticles().then((articles)=>{
+    const {topic} = req.query
+    const promisesArr = [fetchArticles(topic)]
+    if(topic){
+promisesArr.push(checkTopicExists(topic))
+    }
+Promise.all(promisesArr).then((resolvedPromises)=>{
+    const articles = resolvedPromises[0]
     res.status(200).send({articles})
 }).catch((err)=>{
     next(err)
