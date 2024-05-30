@@ -78,12 +78,12 @@ describe("GET /api/articles/:article_id", () => {
         });
       });
   });
-  test("404 status code: No articles with that id! when passed an id that does not match any article in database", () => {
+  test("404 status code: No article with that id! when passed an id that does not match any article in database", () => {
     return request(app)
       .get("/api/articles/1000")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("No articles with that id!");
+        expect(body.msg).toBe("No article with that id!");
       });
   });
   test("400 status code: Invalid input: expected a number when passed an id that is not a number", () => {
@@ -94,6 +94,42 @@ describe("GET /api/articles/:article_id", () => {
         expect(body.msg).toBe("Invalid input: expected a number");
       });
   });
+  test("200 status code: responds with an article object corresponding to the article_id provided that includes a comment_count property with a value equal to the number of comments associated with that article; works when comment_count > 0", ()=>{
+    return request(app)
+    .get('/api/articles/1')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: 1,
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: 11
+        })
+    })
+})
+test("200 status code: responds with an article object corresponding to the article_id provided that includes a comment_count property with a value equal to the number of comments associated with that article; works when comment_count = 0", ()=>{
+    return request(app)
+    .get('/api/articles/2')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: 2,
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: 0
+        })
+    })
+})
 });
 
 describe("GET /api/articles", () => {
