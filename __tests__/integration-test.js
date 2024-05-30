@@ -315,7 +315,6 @@ describe("PATCH /api/articles/:article_id", ()=>{
             article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
           })
         })
-
     })
     test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where newVote is >1", ()=>{
         return request(app)
@@ -334,7 +333,6 @@ describe("PATCH /api/articles/:article_id", ()=>{
             article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
           })
         })
-
     })
     test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where newVote is -1", ()=>{
         return request(app)
@@ -420,6 +418,15 @@ describe("PATCH /api/articles/:article_id", ()=>{
         .expect(400)
         .then(({body})=>{
           expect(body.msg).toBe('Unexpected properties on request body')
+        })
+    })
+    test('400 status code: "Invalid input: expected a number", when passed an article_id that is not a number', ()=>{
+        return request(app)
+        .patch('/api/articles/four')
+        .send({inc_votes : 1})
+        .expect(400)
+        .then(({body})=>{
+            expect(body.msg).toBe('Invalid input: expected a number')
         })
     })
 })

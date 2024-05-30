@@ -54,9 +54,6 @@ exports.editArticle = (article_id, body)=>{
       else {
       return db.query("UPDATE articles SET votes = $1 WHERE article_id = $2 RETURNING *", [updatedVotes, article_id])
     .then(({rows})=>{
-        if(rows.length===0){
-            return Promise.reject({status: 404, msg:"That article does not exist!"})
-            }
             return rows[0]
     })
 }
