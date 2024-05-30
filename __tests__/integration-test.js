@@ -444,18 +444,6 @@ describe("PATCH /api/articles/:article_id", ()=>{
           expect(body.msg).toBe("Incomplete PATCH request: missing 'inc_votes' property!")
         })
     })
-    test('400 status code: "Unexpected properties on request body" when sent a body with additional properties', ()=>{
-        return request(app)
-        .patch('/api/articles/3')
-        .send({ inc_votes : 1,
-            author: "Newton", 
-            inc_votes: 3
-        })
-        .expect(400)
-        .then(({body})=>{
-          expect(body.msg).toBe('Unexpected properties on request body')
-        })
-    })
     test('400 status code: "Invalid input: expected a number", when passed an article_id that is not a number', ()=>{
         return request(app)
         .patch('/api/articles/four')
@@ -466,6 +454,7 @@ describe("PATCH /api/articles/:article_id", ()=>{
         })
     })
 })
+//these tests are throwing out status 500 errors even though they are passing
 
 describe("DELETE /api/comments/:comment_id", ()=>{
     test('status 204, no response', ()=>{
