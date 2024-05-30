@@ -436,8 +436,8 @@ describe("DELETE /api/comments/:comment_id", ()=>{
         return request(app)
         .delete('/api/comments/1')
         .expect(204)
-        .then((body)=>{
-            expect(Object.keys(body)).not.toInclude('body')
+        .then((response)=>{
+            expect(Object.keys(response)).not.toInclude('body')
     })
     })
     test('status 404, responds with "That comment does not exist!" if passed a comment_id that doesn\'t exist', ()=>{

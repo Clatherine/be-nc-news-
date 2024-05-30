@@ -34,11 +34,9 @@ exports.postComment = (req, res, next)=>{
 
 exports.deleteComment = (req,res,next)=>{
     const {comment_id} = req.params
-    checkCommentIdExists(comment_id).then(()=>{
-        return removeComment(comment_id) 
-        .then(()=>{
-            res.status(204).end()
-        })
+    removeComment(comment_id)
+    .then(()=>{
+        res.status(204).end()
     })
     .catch(next)
   
