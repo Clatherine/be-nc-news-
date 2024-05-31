@@ -52,7 +52,6 @@ app.use((err,req,res,next)=>{
 })
 
 app.use((err, req, res, next)=>{
-    console.log(err, 'error from 500 error block')
   res.status(500).send({msg: 'internal server error'})
 })
 
