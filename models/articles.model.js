@@ -76,7 +76,7 @@ exports.editArticle = (article_id, body) => {
       if (updatedVotes < 0) {
         return Promise.reject({
           status: 400,
-          msg: "We're not popular enough to subtract that amount!",
+          msg: `We're not popular enough to subtract that amount! We only have ${currentVotes} votes!`,
         });
       } else {
         return db

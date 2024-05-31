@@ -462,7 +462,7 @@ describe("POST /api/articles/:article_id/comments", () => {
 });
 
 describe("PATCH /api/articles/:article_id", () => {
-  test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where newVote is 1", () => {
+  test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where inc_votes is 1", () => {
     return request(app)
       .patch("/api/articles/1")
       .send({ inc_votes: 1 })
@@ -481,7 +481,7 @@ describe("PATCH /api/articles/:article_id", () => {
         });
       });
   });
-  test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where newVote is >1", () => {
+  test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where inc_votes is >1", () => {
     return request(app)
       .patch("/api/articles/1")
       .send({ inc_votes: 3 })
@@ -500,7 +500,7 @@ describe("PATCH /api/articles/:article_id", () => {
         });
       });
   });
-  test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where newVote is -1", () => {
+  test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where inc_votes is -1", () => {
     return request(app)
       .patch("/api/articles/1")
       .send({ inc_votes: -1 })
@@ -519,7 +519,7 @@ describe("PATCH /api/articles/:article_id", () => {
         });
       });
   });
-  test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where newVote is <-1", () => {
+  test("200 status code: responds with updated article when passed an object in the form of { inc_votes: newVote } where inc_votes is <-1", () => {
     return request(app)
       .patch("/api/articles/1")
       .send({ inc_votes: -3 })
@@ -538,14 +538,14 @@ describe("PATCH /api/articles/:article_id", () => {
         });
       });
   });
-  test("400 status code: responds with 'We're not popular enough to subtract that amount!' if sent a negative number greater than the initial number of votes", () => {
+  test("400 status code: responds with 'We're not popular enough to subtract that amount! We only have {current number of} votes!' if sent a negative number greater than the initial number of votes", () => {
     return request(app)
       .patch("/api/articles/1")
       .send({ inc_votes: -150 })
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe(
-          "We're not popular enough to subtract that amount!"
+          "We're not popular enough to subtract that amount! We only have 100 votes!"
         );
       });
   });
@@ -667,3 +667,168 @@ describe("GET /api/users/:username", () => {
       });
   });
 });
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("200 status code: responds with updated comment when passed an object in the form of { inc_votes: newVote } where inc_votes is 1", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedComment).toEqual({
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 17,
+          author: "butter_bridge",
+          article_id: 9,
+          created_at: expect.any(String),
+          comment_id: 1
+        });
+      });
+  });
+  test("200 status code: responds with updated comment when passed an object in the form of { inc_votes: newVote } where inc_votes is <0", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: -1 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedComment).toEqual({
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 15,
+          author: "butter_bridge",
+          article_id: 9,
+          created_at: expect.any(String),
+          comment_id: 1
+        });
+      });
+  });
+  test("200 status code: responds with same comment when passed an object in the form of { inc_votes: newVote } where inc_votes is 0", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: 0 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedComment).toEqual({
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 16,
+          author: "butter_bridge",
+          article_id: 9,
+          created_at: expect.any(String),
+          comment_id: 1
+        });
+      });
+  });
+  test("400 status code: responds with message 'We're not popular enough to subtract that amount! We only have {current number of} votes!' where inc_votes is a negative number greater than the current number of votes", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: -20 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual(
+            "We're not popular enough to subtract that amount! We only have 16 votes!"
+        );
+      });
+  });
+  test("400 status code: responds with message 'Incomplete PATCH request: missing 'inc_votes' property!' where sent object does not include the inc_votes property", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual(
+            "Incomplete PATCH request: missing 'inc_votes' property!"
+        );
+      });
+  });
+  test("400 status code: responds with message 'Invalid input: expected a number' where passed a string for the comment_id", () => {
+    return request(app)
+      .patch("/api/comments/one")
+      .send({ inc_votes: 2 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual(
+            "Invalid input: expected a number"
+        );
+      });
+  });
+  test("400 status code: responds with message 'Invalid input: expected a number' where passed a string for the inc_votes value", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: "two" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual(
+            "Invalid input: expected a number"
+        );
+      });
+  });
+  test("404 status code: responds with message 'That comment does not exist!' where passed a comment_id that doesn't exist", () => {
+    return request(app)
+      .patch("/api/comments/400")
+      .send({ inc_votes: 2 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual(
+            "That comment does not exist!"
+        );
+      });
+  });
+  test("404 status code: responds with message 'That comment does not exist!' where passed a comment_id that doesn't exist", () => {
+    return request(app)
+      .patch("/api/comments/400")
+      .send({ inc_votes: 2 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual(
+            "That comment does not exist!"
+        );
+      });
+  });
+  test("200 status code: responds with updated comment when passed an object in the form of { inc_votes: newVote } where inc_votes is 1 AND object includes additional properties (ignores these additional props)", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: 1,
+        extra_property: 'whatever'
+       })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedComment).toEqual({
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 17,
+          author: "butter_bridge",
+          article_id: 9,
+          created_at: expect.any(String),
+          comment_id: 1
+        });
+      });
+  });
+});
+
+//note amend patch request above too to take Inc_votes val of 0
+
+xdescribe("POST /api/articles", ()=>{
+    test("201 status code: responds with the posted article", ()=>{
+        return request(app)
+        .post("/api/articles")
+        .send({
+            author: "lurker",
+            title: "my very special article",
+            body: "my lovely lovely body",
+            topic: "cats",
+            article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        })
+        .expect(201)
+        .then(({body})=>{
+            expect(body.article).toMatchObject({
+            author: "lurker",
+            title: "my very special article",
+            body: "my lovely lovely body",
+            topic: "cats",
+            article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            article_id: expect.any(Number),
+            votes: 0,
+            created_at: expect.any(String),
+            comment_count: 0
+            })
+        })
+    })
+})

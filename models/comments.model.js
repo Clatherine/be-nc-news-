@@ -31,8 +31,34 @@ exports.removeComment = (comment_id)=>{
 exports.checkCommentIdExists = (comment_id)=>{
     return db.query("SELECT * FROM comments WHERE comment_id = $1", [comment_id])
     .then(({rows})=>{
+        console.log(rows, 'rows')
         if (rows.length === 0){
             return Promise.reject({status: 404, msg:"That comment does not exist!"})
         }
     })
+}
+
+exports.editComment = (comment_id, body) =>{
+    return db
+    .query("SELECT votes FROM comments WHERE comment_id = $1", [comment_id])
+    .then(({ rows }) => {
+      const currentVotes = rows[0].votes;
+      const increment = body.inc_votes;
+      const updatedVotes = currentVotes + increment;
+      if (updatedVotes < 0) {
+        return Promise.reject({
+          status: 400,
+          msg: `We're not popular enough to subtract that amount! We only have ${currentVotes} votes!`,
+        });
+      } else {
+        return db
+          .query(
+            "UPDATE comments SET votes = $1 WHERE comment_id = $2 RETURNING *",
+            [updatedVotes, comment_id]
+          )
+          .then(({ rows }) => {
+            return rows[0];
+          });
+      }
+    });
 }
