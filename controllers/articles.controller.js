@@ -37,7 +37,7 @@ exports.patchArticle = (req, res, next) => {
   const { article_id } = req.params;
   const { body } = req;
   const bodyKeys = Object.keys(body);
-  if (!body.inc_votes) {
+  if (!bodyKeys.includes('inc_votes')) {
     res
       .status(400)
       .send({ msg: "Incomplete PATCH request: missing 'inc_votes' property!" });
