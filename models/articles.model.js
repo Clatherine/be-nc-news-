@@ -1,6 +1,7 @@
 const db = require("../db/connection");
 const fs = require("fs/promises");
 const { checkTopicExists } = require("./topics.model");
+const format = require("pg-format")
 
 exports.fetchArticleById = (article_id) => {
   return db
@@ -90,3 +91,30 @@ exports.editArticle = (article_id, body) => {
       }
     });
 };
+
+exports.addArticle = (article) =>{
+  const valuesArr = [[article.author, article.title, article.body, article.topic]]
+ 
+let queryStr = "INSERT INTO articles (author, title, body, topic"
+
+if (article.article_img_url){
+  queryStr +=", article_img_url"
+  valuesArr[0].push(article.article_img_url)
+  console.log('entering if block')
+}
+console.log('passing to here')
+queryStr += ") VALUES %L RETURNING *"
+
+  const formattedQuery = format(queryStr, valuesArr)
+  console.log(formattedQuery, 'formattedQuery')
+  return db.query(formattedQuery)
+  .then(({rows})=>{
+    console.log(rows, 'rows')
+const article_id = rows[0].article_id
+return db.query(`SELECT articles.author, articles.title, articles.body, articles.topic, articles.article_img_url, articles.article_id, articles.votes, articles.created_at, COUNT(comments.comment_id)::INT AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id`, [article_id]).then(({rows})=>{
+  console.log(rows)
+  return rows[0]
+})  
+  })
+
+}

@@ -402,7 +402,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Invalid input: expected a number");
       });
   });
-  test('404 status code: "That username does not exist!" if passed a username that does not exist in the users table', () => {
+  test('404 status code: "That username/author does not exist!" if passed a username that does not exist in the users table', () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send({
@@ -411,7 +411,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       })
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("That username does not exist!");
+        expect(body.msg).toBe("That username/author does not exist!");
       });
   });
   test('404 status code: "That article does not exist!" if passed an article_id that does not exist in articles table', () => {
@@ -669,20 +669,20 @@ describe("GET /api/users/:username", () => {
         });
       });
   });
-  test("404 status code: responds with a message of 'That username does not exist' when passed a username that does not exist", () => {
+  test("404 status code: responds with a message of 'That username/author does not exist' when passed a username that does not exist", () => {
     return request(app)
       .get("/api/users/lurking")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("That username does not exist!");
+        expect(body.msg).toBe("That username/author does not exist!");
       });
   });
-  test("404 status code: responds with a message of 'That username does not exist' when passed a number", () => {
+  test("404 status code: responds with a message of 'That username/author does not exist' when passed a number", () => {
     return request(app)
       .get("/api/users/1")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("That username does not exist!");
+        expect(body.msg).toBe("That username/author does not exist!");
       });
   });
 });
@@ -822,10 +822,8 @@ describe("PATCH /api/comments/:comment_id", () => {
   });
 });
 
-//note amend patch request above too to take Inc_votes val of 0
-
-xdescribe("POST /api/articles", ()=>{
-    test("201 status code: responds with the posted article", ()=>{
+describe("POST /api/articles", ()=>{
+    test("201 status code: responds with the posted article when sent body with all required properties and an article_img_url", ()=>{
         return request(app)
         .post("/api/articles")
         .send({
@@ -837,7 +835,7 @@ xdescribe("POST /api/articles", ()=>{
         })
         .expect(201)
         .then(({body})=>{
-            expect(body.article).toMatchObject({
+            expect(body.addedArticle).toMatchObject({
             author: "lurker",
             title: "my very special article",
             body: "my lovely lovely body",
@@ -848,6 +846,162 @@ xdescribe("POST /api/articles", ()=>{
             created_at: expect.any(String),
             comment_count: 0
             })
+        })
+    })
+    test("201 status code: responds with the posted article including the default img_url when sent body with all required properties but no article_img_url", ()=>{
+        return request(app)
+        .post("/api/articles")
+        .send({
+            author: "lurker",
+            title: "my very special article",
+            body: "my lovely lovely body",
+            topic: "cats",
+        })
+        .expect(201)
+        .then(({body})=>{
+            expect(body.addedArticle).toMatchObject({
+            author: "lurker",
+            title: "my very special article",
+            body: "my lovely lovely body",
+            topic: "cats",
+            article_img_url: "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700",
+            article_id: expect.any(Number),
+            votes: 0,
+            created_at: expect.any(String),
+            comment_count: 0
+            })
+        })
+    })
+    test("400 status code: responds with 'Incomplete POST request: one or more required fields missing data' when sent a body missing one or more required fields", ()=>{
+        return request(app)
+        .post("/api/articles")
+        .send({
+            author: "lurker",
+            title: "my very special article",
+            topic: "cats",
+        })
+        .expect(400)
+        .then(({body})=>{
+            expect(body.msg).toBe("Incomplete POST request: one or more required fields missing data")
+        })
+    })
+    test("404 status code: responds with 'That username/author does not exist!' when sent an author property value that does not exist in the users table", ()=>{
+        return request(app)
+        .post("/api/articles")
+        .send({
+            author: "lurking",
+            title: "my very special article",
+            topic: "cats",
+            body: "my lovely lovely body",
+        })
+        .expect(404)
+        .then(({body})=>{
+            expect(body.msg).toBe("That username/author does not exist!")
+        })
+    })
+    test("404 status code: responds with 'That topic does not exist!' when sent a topic property value that does not exist in the topics table", ()=>{
+        return request(app)
+        .post("/api/articles")
+        .send({
+            author: "lurker",
+            title: "my very special article",
+            topic: "mice",
+            body: "my lovely lovely body",
+        })
+        .expect(404)
+        .then(({body})=>{
+            expect(body.msg).toBe("That topic does not exist!")
+        })
+    })
+    test("201 status code: responds with the posted article when sent body with all required properties and an article_img_url plus additional unrequired properties (these will be ignored)", ()=>{
+        return request(app)
+        .post("/api/articles")
+        .send({
+            author: "lurker",
+            title: "my very special article",
+            body: "my lovely lovely body",
+            topic: "cats",
+            article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            extra_property: 4
+        })
+        .expect(201)
+        .then(({body})=>{
+            expect(body.addedArticle).toMatchObject({
+            author: "lurker",
+            title: "my very special article",
+            body: "my lovely lovely body",
+            topic: "cats",
+            article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            article_id: expect.any(Number),
+            votes: 0,
+            created_at: expect.any(String),
+            comment_count: 0
+            })
+        })
+    })
+    test("201 status code: responds with the posted article when sent a body that has a number rather than a string for any property (number will be converted into a string in response article)", ()=>{
+        return request(app)
+        .post("/api/articles")
+        .send({
+            author: "lurker",
+            title: "my very special article",
+            topic: "cats",
+            body: 1,
+            article_img_url: "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
+        })
+        .expect(201)
+        .then(({body})=>{
+            expect(body.addedArticle).toMatchObject({
+                author: "lurker",
+                title: "my very special article",
+                body: "1",
+                topic: "cats",
+                article_img_url: "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700",
+                article_id: expect.any(Number),
+                votes: 0,
+                created_at: expect.any(String),
+                comment_count: 0
+                })
+        })
+    })
+    test("400 status code: responds with 'Incomplete POST request: one or more required fields missing data' if passed a body where one or more properties has no value", ()=>{
+        return request(app)
+        .post("/api/articles")
+        .send({
+            author: "lurker",
+            title: "my very special article",
+            topic: "cats",
+            body: "",
+            article_img_url: "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
+        })
+        .expect(400)
+        .then(({body})=>{
+            expect(body.msg).toBe("Incomplete POST request: one or more required fields missing data")
+        })
+    })
+    test("201 status code: responds with the added article if sent a complete body that has an empty string for url, with added article using default url", ()=>{
+        return request(app)
+        .post("/api/articles")
+        .send({
+            author: "lurker",
+            title: "my very special article",
+            topic: "cats",
+            body: "whatevs",
+            article_img_url: ""
+        })
+        .expect(201)
+        .then(({body})=>{
+            expect(body.addedArticle).toMatchObject({
+                author: "lurker",
+                title: "my very special article",
+                body: "whatevs",
+                topic: "cats",
+                article_img_url: "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700",
+                article_id: expect.any(Number),
+                votes: 0,
+                created_at: expect.any(String),
+                comment_count: 0
+                })
         })
     })
 })
