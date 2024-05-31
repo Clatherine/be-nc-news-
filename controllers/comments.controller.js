@@ -1,4 +1,4 @@
-const {fetchArticleCommentsByArticleId, addComment, removeComment, checkCommentIdExists} = require("../models/comments.model")
+const {fetchArticleCommentsByArticleId, addComment, removeComment, checkCommentIdExists, editComment} = require("../models/comments.model")
 const{checkArticleIdExists} = require("../models/articles.model")
 const{checkUserExists} = require("../models/users.model")
 
@@ -40,4 +40,26 @@ exports.deleteComment = (req,res,next)=>{
     })
     .catch(next)
   
+}
+
+exports.patchComment = (req,res,next)=>{
+    const {body} = req
+    const {comment_id} = req.params
+    const bodyKeys = Object.keys(body)
+    if (!bodyKeys.includes('inc_votes')) {
+        res
+          .status(400)
+          .send({ msg: "Incomplete PATCH request: missing 'inc_votes' property!" });
+      }
+      else{
+        checkCommentIdExists(comment_id)
+        .then(() => {
+          return editComment(comment_id, body).then((updatedComment) => {
+            res.status(200).send({ updatedComment });
+          });
+        })
+        .catch((err) => {
+          next(err);
+        });
+      }
 }
