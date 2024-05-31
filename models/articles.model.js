@@ -13,23 +13,37 @@ exports.fetchArticleById = (article_id)=>{
     })
 }
 
-exports.fetchArticles = (topic)=>{
+exports.fetchArticles = (topic, order="desc", sort_by="created_at")=>{
+const permittedOrders = ["asc", "ASC", "desc", "DESC"]
+const permittedSortBys = ["author", "title", "article_id", "topic", "created_at", "votes", "comment_count"]
+
+if(!permittedSortBys.includes(sort_by)){
+    return Promise.reject({status: 400, msg: "invalid sort_by request"})
+}
+
+else if(!permittedOrders.includes(order)){
+    return Promise.reject({status: 400, msg: "invalid order request"})
+}
+
+else{
 let queryStr = "SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, article_img_url , COUNT(comments.comment_id):: INT AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id "
 
 const queryArr =[]
+let dollarCount = 1
 
 if(topic){
-   queryStr +="WHERE topic = $1 "
+   queryStr +=`WHERE topic = $${dollarCount} `
     queryArr.push(topic)
-    
+    dollarCount ++
 }
 
-queryStr += "GROUP BY articles.article_id ORDER BY created_at DESC"
+queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`
 
     return db.query(queryStr, queryArr)
     .then(({rows})=>{
         return rows
     })
+}
 }
 
 exports.checkArticleIdExists = (article_id)=>{

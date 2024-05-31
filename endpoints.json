@@ -29,8 +29,8 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles, that can be filtered by the allowed queries",
-    "queries": ["topic"],
+    "description": "serves an array of all articles, that can be filtered by topic, sorted by any valid column (defaulting to 'created_at'), with specified order (defaulting to desending)",
+    "queries": ["topic", "sort_by = created_at", "order = desc"],
     "exampleResponse": {
       "articles": [
         {

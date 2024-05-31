@@ -193,6 +193,132 @@ test("404 status code: resolves with a message of 'That topic does not exist!' i
         expect(body.msg).toBe('That topic does not exist!')
     })
 })
+test("200 status code: responds with an array of all articles sorted by date in ascending order when passed a query of 'order=asc'", ()=>{
+    return request(app)
+    .get('/api/articles?order=asc')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.articles.length).toBe(13)
+        expect(body.articles).toBeSortedBy("created_at")
+        body.articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            });
+            expect(article).not.toHaveProperty("body");
+          });
+
+    })
+})
+test("200 status code: responds with an array of all articles sorted by date in ascending order when passed a query of 'order=ASC'", ()=>{
+    return request(app)
+    .get('/api/articles?order=ASC')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.articles).toBeSortedBy("created_at")
+})
+})
+test("200 status code: responds with an array of all articles sorted by date in descending order when passed a query of 'order=DESC'", ()=>{
+    return request(app)
+    .get('/api/articles?order=DESC')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.articles).toBeSortedBy("created_at", {descending: true})
+})
+})
+test("400 status code: responds with a message of 'invalid order request' when passed an order value that is not asc, ASC, desc or DESC", ()=>{
+    return request(app)
+    .get('/api/articles?order=none')
+    .expect(400)
+    .then(({body})=>{
+        expect(body.msg).toBe('invalid order request')
+})
+})
+test("200 status code: responds with an array of all articles sorted by article_id, descending, when passed a 'sort_by' query with value 'article_id'", ()=>{
+    return request(app)
+    .get('/api/articles/?sort_by=article_id')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.articles.length).toBe(13)
+        expect(body.articles).toBeSortedBy("article_id", {descending: true})
+    })
+})
+test("200 status code: responds with an array of all articles sorted by author, descending alphabetically, when passed a 'sort_by' query with value 'author'", ()=>{
+    return request(app)
+    .get('/api/articles/?sort_by=author')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.articles.length).toBe(13)
+        expect(body.articles).toBeSortedBy("author", {descending: true})
+    })
+})
+test("200 status code: responds with an array of all articles sorted by comment_count, descending, when passed a 'sort_by' query with value 'comment_count'", ()=>{
+    return request(app)
+    .get('/api/articles/?sort_by=comment_count')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.articles.length).toBe(13)
+        expect(body.articles).toBeSortedBy("comment_count", {descending: true})
+    })
+})
+test("200 status code: responds with an array of all articles sorted by votes, descending, when passed a 'sort_by' query with value 'votes'", ()=>{
+    return request(app)
+    .get('/api/articles/?sort_by=votes')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.articles.length).toBe(13)
+        expect(body.articles).toBeSortedBy("votes", {descending: true})
+    })
+})
+test("200 status code: responds with an array of all articles sorted by votes, ascending, when passed a 'sort_by' query with value 'votes' AND an 'order' query with value 'asc'", ()=>{
+    return request(app)
+    .get('/api/articles/?sort_by=votes&order=asc')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.articles.length).toBe(13)
+        expect(body.articles).toBeSortedBy("votes", {ascending: true})
+    })
+})
+test("200 status code: responds with an array of all articles sorted by title, ascending, when passed a 'sort_by' query with value 'title' AND an 'order' query with value 'asc'", ()=>{
+    return request(app)
+    .get('/api/articles/?sort_by=title&order=asc')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.articles.length).toBe(13)
+        expect(body.articles).toBeSortedBy("title", {ascending: true})
+    })
+})
+test("200 status code: responds with an array of all articles sorted by title, ascending, when passed a 'sort_by' query with value 'article_id' AND an 'order' query with value 'ASC'", ()=>{
+    return request(app)
+    .get('/api/articles/?sort_by=article_id&order=ASC')
+    .expect(200)
+    .then(({body})=>{
+        expect(body.articles.length).toBe(13)
+        expect(body.articles).toBeSortedBy("article_id", {ascending: true})
+    })
+})
+test("400 status code: responds with a message pf 'invalid sort_by request' when passed a sort_by query with an invalid value", ()=>{
+    return request(app)
+    .get('/api/articles/?sort_by=popularity')
+    .expect(400)
+    .then(({body})=>{
+        expect(body.msg).toBe('invalid sort_by request')
+    })
+})
+test("400 status code: responds with a message pf 'invalid sort_by request' when passed a sort_by query with an invalid value AND an invalid order query", ()=>{
+    return request(app)
+    .get('/api/articles/?sort_by=popularity&order=down')
+    .expect(400)
+    .then(({body})=>{
+        expect(body.msg).toBe('invalid sort_by request')
+    })
+})
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -454,7 +580,6 @@ describe("PATCH /api/articles/:article_id", ()=>{
         })
     })
 })
-//these tests are throwing out status 500 errors even though they are passing
 
 describe("DELETE /api/comments/:comment_id", ()=>{
     test('status 204, no response', ()=>{
