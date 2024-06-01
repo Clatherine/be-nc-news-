@@ -19,8 +19,8 @@ exports.getArticlesById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  const { topic, order, sort_by, limit } = req.query;
-  const promisesArr = [fetchArticles(topic, order, sort_by, limit)];
+  const { topic, order, sort_by, limit, p } = req.query;
+  const promisesArr = [fetchArticles(topic, order, sort_by, limit, p)];
   if (topic) {
     promisesArr.push(checkTopicExists(topic));
   }
@@ -56,21 +56,16 @@ exports.patchArticle = (req, res, next) => {
 };
 
 exports.postArticle = (req, res, next) => {
-  console.log('entering controller')
   const {body} = req
   const bodyKeys = Object.keys(body)
-  console.log(bodyKeys, 'bodyKeys')
   if (!body.author || !body.body || !body.title || !body.topic){
     res.status(400).send({msg: "Incomplete POST request: one or more required fields missing data"
     })
   }
   else{
-    console.log('entering else block')
     const promisesArr = [checkUserExists(body.author), checkTopicExists(body.topic)]
     Promise.all(promisesArr).then(()=>{
-      console.log('passes promise all')
       addArticle(body).then((addedArticle)=>{
-        console.log("passed through addArticle")
         res.status(201).send({addedArticle})
       })
     }).catch(next)
