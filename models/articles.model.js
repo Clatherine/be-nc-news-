@@ -17,7 +17,7 @@ exports.fetchArticleById = (article_id) => {
     });
 };
 
-exports.fetchArticles = (topic, order = "desc", sort_by = "created_at") => {
+exports.fetchArticles = (topic, order = "desc", sort_by = "created_at", limit = 10) => {
   const permittedOrders = ["asc", "ASC", "desc", "DESC"];
   const permittedSortBys = [
     "author",
@@ -46,7 +46,8 @@ exports.fetchArticles = (topic, order = "desc", sort_by = "created_at") => {
       dollarCount++;
     }
 
-    queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
+    queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order} LIMIT $${dollarCount}`
+    queryArr.push(limit);
 
     return db.query(queryStr, queryArr).then(({ rows }) => {
       return rows;

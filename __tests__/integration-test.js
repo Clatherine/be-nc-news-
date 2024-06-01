@@ -133,12 +133,12 @@ describe("GET /api/articles/:article_id", () => {
 });
 
 describe("GET /api/articles", () => {
-  test("200 status code: responds with an array of all articles, sorted by date in descending order", () => {
+  test("200 status code: responds with an array of all articles, sorted by date in descending order, limited to first 10 articles", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(13);
+        expect(body.articles.length).toBe(10);
         body.articles.forEach((article) => {
           expect(article).toMatchObject({
             author: expect.any(String),
@@ -155,12 +155,12 @@ describe("GET /api/articles", () => {
         expect(body.articles).toBeSortedBy("created_at", { descending: true });
       });
   });
-  test("200 status code: responds with an array of articles filtered by the topic provided, sorted by date in descending order, when passed a query of 'topic' with a topic that exists and has matching articles", () => {
+  test("200 status code: responds with an array of articles filtered by the topic provided, sorted by date in descending order, when passed a query of 'topic' with a topic that exists and has matching articles, limited to first 10 articles", () => {
     return request(app)
       .get("/api/articles?topic=mitch")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(12);
+        expect(body.articles.length).toBe(10);
         expect(body.articles).toBeSortedBy("created_at", { descending: true });
         body.articles.forEach((article) => {
           expect(article).toMatchObject({
@@ -193,12 +193,12 @@ describe("GET /api/articles", () => {
         expect(body.msg).toBe("That topic does not exist!");
       });
   });
-  test("200 status code: responds with an array of all articles sorted by date in ascending order when passed a query of 'order=asc'", () => {
+  test("200 status code: responds with an array of all articles sorted by date in ascending order when passed a query of 'order=asc', limited to first 10 articles", () => {
     return request(app)
       .get("/api/articles?order=asc")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(13);
+        expect(body.articles.length).toBe(10);
         expect(body.articles).toBeSortedBy("created_at");
         body.articles.forEach((article) => {
           expect(article).toMatchObject({
@@ -239,68 +239,68 @@ describe("GET /api/articles", () => {
         expect(body.msg).toBe("invalid order request");
       });
   });
-  test("200 status code: responds with an array of all articles sorted by article_id, descending, when passed a 'sort_by' query with value 'article_id'", () => {
+  test("200 status code: responds with an array of all articles sorted by article_id, descending, when passed a 'sort_by' query with value 'article_id', limited to first 10 articles", () => {
     return request(app)
       .get("/api/articles/?sort_by=article_id")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(13);
+        expect(body.articles.length).toBe(10);
         expect(body.articles).toBeSortedBy("article_id", { descending: true });
       });
   });
-  test("200 status code: responds with an array of all articles sorted by author, descending alphabetically, when passed a 'sort_by' query with value 'author'", () => {
+  test("200 status code: responds with an array of all articles sorted by author, descending alphabetically, when passed a 'sort_by' query with value 'author', limited to first 10 articles", () => {
     return request(app)
       .get("/api/articles/?sort_by=author")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(13);
+        expect(body.articles.length).toBe(10);
         expect(body.articles).toBeSortedBy("author", { descending: true });
       });
   });
-  test("200 status code: responds with an array of all articles sorted by comment_count, descending, when passed a 'sort_by' query with value 'comment_count'", () => {
+  test("200 status code: responds with an array of all articles sorted by comment_count, descending, when passed a 'sort_by' query with value 'comment_count', limited to first 10 articles", () => {
     return request(app)
       .get("/api/articles/?sort_by=comment_count")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(13);
+        expect(body.articles.length).toBe(10);
         expect(body.articles).toBeSortedBy("comment_count", {
           descending: true,
         });
       });
   });
-  test("200 status code: responds with an array of all articles sorted by votes, descending, when passed a 'sort_by' query with value 'votes'", () => {
+  test("200 status code: responds with an array of all articles sorted by votes, descending, when passed a 'sort_by' query with value 'votes', limited to first 10 articles", () => {
     return request(app)
       .get("/api/articles/?sort_by=votes")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(13);
+        expect(body.articles.length).toBe(10);
         expect(body.articles).toBeSortedBy("votes", { descending: true });
       });
   });
-  test("200 status code: responds with an array of all articles sorted by votes, ascending, when passed a 'sort_by' query with value 'votes' AND an 'order' query with value 'asc'", () => {
+  test("200 status code: responds with an array of all articles sorted by votes, ascending, when passed a 'sort_by' query with value 'votes' AND an 'order' query with value 'asc', limited to first 10 articles", () => {
     return request(app)
       .get("/api/articles/?sort_by=votes&order=asc")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(13);
+        expect(body.articles.length).toBe(10);
         expect(body.articles).toBeSortedBy("votes", { ascending: true });
       });
   });
-  test("200 status code: responds with an array of all articles sorted by title, ascending, when passed a 'sort_by' query with value 'title' AND an 'order' query with value 'asc'", () => {
+  test("200 status code: responds with an array of all articles sorted by title, ascending, when passed a 'sort_by' query with value 'title' AND an 'order' query with value 'asc', limited to first 10 articles", () => {
     return request(app)
       .get("/api/articles/?sort_by=title&order=asc")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(13);
+        expect(body.articles.length).toBe(10);
         expect(body.articles).toBeSortedBy("title", { ascending: true });
       });
   });
-  test("200 status code: responds with an array of all articles sorted by title, ascending, when passed a 'sort_by' query with value 'article_id' AND an 'order' query with value 'ASC'", () => {
+  test("200 status code: responds with an array of all articles sorted by title, ascending, when passed a 'sort_by' query with value 'article_id' AND an 'order' query with value 'ASC', limited to first 10 articles", () => {
     return request(app)
       .get("/api/articles/?sort_by=article_id&order=ASC")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(13);
+        expect(body.articles.length).toBe(10);
         expect(body.articles).toBeSortedBy("article_id", { ascending: true });
       });
   });
@@ -320,6 +320,29 @@ describe("GET /api/articles", () => {
         expect(body.msg).toBe("invalid sort_by request");
       });
   });
+  test("200 status code: responds with an array of all articles, sorted by date in descending order, limited to first x articles when passed a limit query of x", () => {
+    return request(app)
+      .get("/api/articles?limit=8")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(8);
+        body.articles.forEach((article) => {
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+          expect(article).not.toHaveProperty("body");
+        });
+        expect(body.articles).toBeSortedBy("created_at", { descending: true });
+      });
+
+    })
 });
 
 describe("GET /api/articles/:article_id/comments", () => {

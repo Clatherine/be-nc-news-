@@ -19,8 +19,8 @@ exports.getArticlesById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  const { topic, order, sort_by } = req.query;
-  const promisesArr = [fetchArticles(topic, order, sort_by)];
+  const { topic, order, sort_by, limit } = req.query;
+  const promisesArr = [fetchArticles(topic, order, sort_by, limit)];
   if (topic) {
     promisesArr.push(checkTopicExists(topic));
   }
