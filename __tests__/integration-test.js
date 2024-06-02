@@ -453,15 +453,23 @@ describe("GET /api/articles", () => {
           });
       });
   });
+  test("200 status code: responds with an array of 0 articles when passed a p query with value 0", () => {
+    return request(app)
+      .get("/api/articles?p=0")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(0);
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
-  test("200 status code: responds with an array of comments for the given article_id, ordered by created_at in descending order", () => {
+  test("200 status code: responds with an array of comments for the given article_id, ordered by created_at in descending order, limited to first 10 comments", () => {
     return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
-        expect(body.comments.length).toBe(11);
+        expect(body.comments.length).toBe(10);
         body.comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
@@ -501,7 +509,115 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("That article does not exist!");
       });
   });
+  test("200 status code: responds with an array of comments for the given article_id, ordered by created_at in descending order, limited to first x comments, when passed a query of 'limit=x'", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(5);
+        body.comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: 1,
+          });
+        });
+        expect(body.comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("200 status code: responds with an array of comments for the given article_id, ordered by created_at in descending order, limited to 2nd 10 comments (or however many are left after first 10), when passed a query of 'p=2'", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(1);
+        body.comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: 1,
+          });
+        });
+        expect(body.comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("200 status code: responds with an empty array  when passed a query of 'p=x', where the total number of comments for the article_id passed is less than 10*(x-1)", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=3")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toEqual([]);
+      });
+  });
+  test("200 status code: responds with all comments for the passed article_id when passed a limit query >= total number of comments for that article", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=15")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(11);
+      });
+  });
+  test("200 status code: responds with the second x comments for the passed article_id when passed a limit query of x and a p query of 2", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=3&p=2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(3);
+        expect(body.comments[0]).toEqual({
+            comment_id: 13,
+          votes: 0,
+          created_at: '2020-06-15T10:25:00.000Z',
+          author: 'icellusedkars',
+          body: 'Fruit pastilles',
+          article_id: 1
+        })
+      });
+  });
+  test("400 status code: 'Invalid input: expected a number' if passed a p value that is not a number", () => {
+    return request(app)
+      .get("/api/articles/2/comments/?p=one")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input: expected a number");
+      });
+  });
+  test("400 status code: 'Invalid input: expected a number' if passed a limit value that is not a number", () => {
+    return request(app)
+      .get("/api/articles/2/comments/?limit=one")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input: expected a number");
+      });
+  });
+  test("200 status code: responds with an empty array when passed a limit value of 0", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=0")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(0);
+      });
+  });
+  test("200 status code: responds with an empty array when passed a p value of 0", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=0")
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body)
+        expect(body.comments.length).toBe(0);
+      });
+  });
 });
+
 
 describe("POST /api/articles/:article_id/comments", () => {
   test("201 status code: responds with the posted comment", () => {

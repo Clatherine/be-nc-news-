@@ -4,7 +4,8 @@ const{checkUserExists} = require("../models/users.model")
 
 exports.getArticleCommentsByArticleId = (req, res, next)=>{
     const {article_id} = req.params
-    const promisesArr = [fetchArticleCommentsByArticleId(article_id),
+    const {limit, p} = req.query
+    const promisesArr = [fetchArticleCommentsByArticleId(article_id, limit, p),
         checkArticleIdExists(article_id)]
     Promise.all(promisesArr)
     .then((resolvedPromises)=>{
