@@ -1,12 +1,22 @@
 const db = require('../db/connection')
 const fs = require('fs/promises')
 const format = require("pg-format")
+const { off } = require('process')
 
-exports.fetchArticleCommentsByArticleId = (article_id)=>{
-    return db.query("SELECT comment_id, votes, created_at, author, body,article_id FROM comments WHERE article_id = $1 ORDER BY created_at DESC", [article_id])
+exports.fetchArticleCommentsByArticleId = (article_id, limit=10, p=1)=>{
+  if(p==0){
+    return db.query("SELECT comment_id, votes, created_at, author, body,article_id FROM comments WHERE article_id = $1 ORDER BY created_at DESC LIMIT 0", [article_id])
+    .then(({rows})=>{
+      return rows
+    })
+  }
+  else{
+  const offset = (p-1)*limit
+    return db.query("SELECT comment_id, votes, created_at, author, body,article_id FROM comments WHERE article_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3", [article_id, limit, offset])
     .then(({rows})=>{
         return rows
     })
+  }
 }
 
 exports.addComment = (comment, article_id)=>{

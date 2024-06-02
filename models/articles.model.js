@@ -45,11 +45,16 @@ exports.fetchArticles = (topic, order = "desc", sort_by = "created_at", limit = 
       queryArr.push(topic);
       dollarCount++;
     }
+if (p==0){
+  queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order} LIMIT 0`
+}
+ else{
 const offset = (p-1)*limit
 
     queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order} LIMIT $${dollarCount} OFFSET $${dollarCount+1}`
     queryArr.push(limit)
     queryArr.push(offset)
+ }
 
     return db.query(queryStr, queryArr).then(({ rows }) => {
       return rows;
