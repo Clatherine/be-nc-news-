@@ -30,7 +30,7 @@
   },
   "GET /api/articles": {
     "description": "serves an array of all articles, that can be filtered by topic, sorted by any valid column (defaulting to 'created_at'), with specified order (defaulting to desending)",
-    "queries": ["topic", "sort_by = created_at", "order = desc", "limit = 10", "p = 1"],
+    "queries": ["topic", "sort_by=created_at", "order=desc", "limit=10", "p=1"],
     "exampleResponse": {
       "articles": [
         {
@@ -47,8 +47,8 @@
     }
   },
   "GET /api/articles/:article_id/comments": {
-    "description": "serves an array of all comments associated with passed article_id",
-    "queries": [],
+    "description": "serves an array of comments associated with passed article_id, sorted by date in descending order by default, limited to 10 articles by default",
+    "queries": ["sort_by=created_at", "order=desc","limit=10", "p=1"],
     "exampleResponse": {
       "comments": [
         {
