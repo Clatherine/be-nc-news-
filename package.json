@@ -28,13 +28,14 @@
     "supertest": "^7.0.0"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.19.2",
+    "husky": "^8.0.3",
     "i": "^0.3.7",
     "jest-sorted": "^1.0.15",
     "pg": "^8.7.3",
-    "pg-format": "^1.0.4",
-    "husky": "^8.0.3"
+    "pg-format": "^1.0.4"
   },
   "jest": {
     "setupFilesAfterEnv": [
