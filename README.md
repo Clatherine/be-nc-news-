@@ -37,8 +37,6 @@ Within these, type:
 
 3. You will need to set up your local databases using 'npm run setup-dbs' 
 
-/* note I'm not sure if this needs to be done or if we are assuming the developer already has databases set up? */
-
 4. You will need to seed your local development database using 'npm run seed'. Note the integration-test file seeds the test database before each test block when it is run.
 
 5. To run tests on the test database, use 'npm run test integration-test.js', or simply 'npm t int'. Note 'npm t' will run both the integration-test file AND the utils.test file.
