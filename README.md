@@ -4,7 +4,7 @@ The hosted version of this directory can be found at: https://v2-nc-news-backend
 
 This project is my first hosted back-end project, which culminates the back-end part of my course at NorthCoders. The project hosts a database containing information about articles and comments on articles on a range of topics, by a range of authors.
 
-To clone this repo, please fork it and clone it using git clone [your forked url]
+To clone this repo, please clone it using git clone.
 
 Before you start:
 1. You will need to install the following:
