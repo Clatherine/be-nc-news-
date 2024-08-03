@@ -65,4 +65,4 @@ Finally, to see the front-end app in action, follow these links:
 - App: https://hot-off-the-press-news.netlify.app/
 - GitHub: https://github.com/Clatherine/nc-news
 
-This portfolio project was created as part of a Digital Skills Bootcamp in Software Development provided by [Northcoders](https://northcoders.com/)
+This portfolio project was created as part of a Digital Skills Bootcamp in Software Development provided by [Northcoders](https://northcoders.com/).
