@@ -5,6 +5,7 @@ const {getArticlesById, getArticles, patchArticle, postArticle} = require("./con
 const {getArticleCommentsByArticleId, postComment, deleteComment, patchComment} = require("./controllers/comments.controller")
 const {getUsers, getUserByUsername} = require("./controllers/users.controller")
 const cors = require('cors');
+const { Client } = require('pg');
 
 const app = express()
 app.use(cors());
