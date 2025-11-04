@@ -10,6 +10,20 @@ const app = express()
 app.use(cors());
 app.use(express.json())
 
+
+app.get('/test-db', async (req, res) => {
+  const client = new Client({ connectionString: process.env.DATABASE_URL });
+  try {
+    await client.connect();
+    const result = await client.query('SELECT 1');
+    await client.end();
+    res.send({ success: true, result: result.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ msg: 'DB connection failed', error: err.message });
+  }
+});
+
 app.get('/api/topics', getTopics)
 
 app.get('/api', getEndpoints)
